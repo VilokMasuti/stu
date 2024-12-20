@@ -1,30 +1,36 @@
-import { useEffect } from 'react'
-import useStore from './store/useStore'
-import { Sidebar } from './components/shared/Sidebar'
-import { Header } from './components/shared/Header'
-import { StudentTable } from './components/shared/StudentTable'
-import { Toaster } from './components/ui/toaster'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Sidebar } from "@/components/shared/Sidebar";
+import { Header } from "@/components/shared/Header";
+import { Toaster } from "@/components/ui/toaster";
+import Dashboard from "@/pages/Dashboard";
+import Students from "@/pages/Students";
+import Reports from "@/pages/Reports";
+import Settings from "@/pages/Settings";
+import Help from "@/pages/Help";
+import Chapter from "@/pages/Chapter";
 
-export default function App() {
-  const { fetchStudents } = useStore()
-
-  useEffect(() => {
-    fetchStudents()
-  }, [fetchStudents])
-
+function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="lg:pl-64">
-        <Header />
-        <main className="py-6">
-          <div className="px-4 sm:px-6 lg:px-8">
-            <StudentTable />
-          </div>
-        </main>
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        <Sidebar />
+        <div className="lg:pl-64">
+          <Header />
+          <main className="p-6">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/students" element={<Students />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/chapter" element={<Chapter />} />
+            </Routes>
+          </main>
+        </div>
+        <Toaster />
       </div>
-      <Toaster />
-    </div>
-  )
+    </Router>
+  );
 }
 
+export default App;

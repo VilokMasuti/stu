@@ -32,86 +32,83 @@ import {
 } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import useStore from '../../store/useStore'
-
+import { Badge } from '../ui/badge'
+import LoadingSpinner from './LoadingSpinner'
 export function StudentTable() {
-  const { toast } = useToast()
+  const { toast } = useToast(); // Use pop-up messages to tell the user what happened (success/error)
+
+  // Fetch the data and functions to show, add, edit, and delete students
   const {
-    students,
-    loading,
-    error,
-    addStudent,
-    updateStudent,
-    deleteStudent,
+    students, loading, error, addStudent, updateStudent, deleteStudent, filters, setFilters
+  } = useStore();
 
-    filters,
-    setFilters
-  } = useStore()
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [selectedStudent, setSelectedStudent] = useState(null)
+  // These are for the "Add/Edit" form
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // Pop-up box: Is it open or closed?
+  const [selectedStudent, setSelectedStudent] = useState(null); // Who are we editing? If empty, we are adding a new one
   const [formData, setFormData] = useState({
-    student_name: '',
-    cohort: 'AY 2024-25',
-    status: 'active',
-    courses: []
-  })
+    student_name: '',       // Start with empty student name
+    cohort: 'AY 2024-25',   // Default year is 'AY 2024-25'
+    status: 'active',       // Default status is 'active'
+    courses: []             // No courses selected initially
+  });
 
-  // Get available courses based on selected class
+  // Function to get all the courses (like Math, Science) based on the selected class
   const getAvailableCourses = () => {
-    const classPrefix = filters.class
+    const classPrefix = filters.class; // Example: "CBSE 9"
     return [
       { name: `${classPrefix} Science`, icon: Book },
       { name: `${classPrefix} Math`, icon: GraduationCap }
-    ]
-  }
+    ];
+  };
 
+  // Function to handle when we click the "Add" or "Save" button
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault(); // Stop the page from reloading when clicking the button
     try {
       if (selectedStudent) {
-        await updateStudent(selectedStudent.id, formData)
-        toast({
-          title: "Success",
-          description: "Student updated successfully",
-        })
+        // If editing, update the student
+        await updateStudent(selectedStudent.id, formData);
+        toast({ title: "Success", description: "Student updated successfully" });
       } else {
-        await addStudent(formData)
-        toast({
-          title: "Success",
-          description: "Student added successfully",
-        })
+        // If adding a new student
+        await addStudent(formData);
+        toast({ title: "Success", description: "Student added successfully" });
       }
-      setIsDialogOpen(false)
-      setSelectedStudent(null)
-      setFormData({
-        student_name: '',
-        cohort: filters.year,
-        status: 'active',
-        courses: []
-      })
+
+      // Close the form and reset it
+      setIsDialogOpen(false);
+      setSelectedStudent(null);
+      setFormData({ student_name: '', cohort: filters.year, status: 'active', courses: [] });
     } catch (error) {
       toast({
         title: "Error",
         description: error.message || "Something went wrong",
-        variant: "destructive",
-      })
+        variant: "destructive"
+      });
     }
-  }
+  };
 
-  if (loading) return <div className="flex items-center justify-center h-64">Loading...</div>
-  if (error) return <div className="flex items-center justify-center h-64 text-red-500">Error: {error}</div>
+  // If the app is still loading, show a spinner (circle animation)
+  if (loading) return <div><LoadingSpinner /></div>;
 
-  const availableCourses = getAvailableCourses()
+  // If there's an error, show it
+  if (error) return <div className="text-red-500">Error: {error}</div>;
+
+  // Get available courses for the dropdown
+  const availableCourses = getAvailableCourses();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-slate-50 shadow-2xl rounded-lg p-1">
+      {/* Container for the filters and "Add New Student" button */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+        {/* Filters Section */}
+        <div className="flex flex-col ml-1 pt-5 sm:flex-row sm:items-center gap-2">
+          {/* Year Selection Dropdown */}
           <Select
             value={filters.year}
             onValueChange={(value) => setFilters({ year: value })}
           >
-            <SelectTrigger className="w-full sm:w-[140px] bg-gray-50">
+            <SelectTrigger className="w-full sm:w-[140px] bg-[#E9EDF1] text-slate-600 font-semibold">
               <SelectValue placeholder="Select Year" />
             </SelectTrigger>
             <SelectContent>
@@ -120,11 +117,12 @@ export function StudentTable() {
             </SelectContent>
           </Select>
 
+          {/* Class Selection Dropdown */}
           <Select
             value={filters.class}
             onValueChange={(value) => setFilters({ class: value })}
           >
-            <SelectTrigger className="w-full sm:w-[140px] bg-gray-50">
+            <SelectTrigger className="w-full sm:w-[140px] bg-[#E9EDF1] text-slate-600 font-semibold">
               <SelectValue placeholder="Select Class" />
             </SelectTrigger>
             <SelectContent>
@@ -133,83 +131,103 @@ export function StudentTable() {
             </SelectContent>
           </Select>
         </div>
+
+        {/* Button to Add a New Student */}
         <Button
           onClick={() => setIsDialogOpen(true)}
-          className="w-full sm:w-auto bg-[#18181B] hover:bg-[#18181B]/90"
+          className="w-full sm:w-auto bg-[#E9EDF1] mr-2 mt-5 hover:bg-none text-slate-600 font-semibold"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add new Student
         </Button>
       </div>
 
+      {/* Table Section */}
       <div className="rounded-lg border bg-white overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
+            {/* Table Header */}
             <TableHeader>
               <TableRow className="bg-gray-50">
-                <TableHead className="font-medium">Student Name</TableHead>
-                <TableHead className="font-medium">Cohort</TableHead>
-                <TableHead className="font-medium">Courses</TableHead>
-                <TableHead className="font-medium">Date Joined</TableHead>
-                <TableHead className="font-medium">Last Login</TableHead>
-                <TableHead className="font-medium w-[80px]">Status</TableHead>
+                <TableHead className="font-semibold text-[#000000]">Student Name</TableHead>
+                <TableHead className="font-semibold text-black">Cohort</TableHead>
+                <TableHead className="font-semibold text-black">Courses</TableHead>
+                <TableHead className="font-semibold text-black">Date Joined</TableHead>
+                <TableHead className="font-semibold text-black">Last Login</TableHead>
+                <TableHead className="font-semibold text-black w-[80px]">Status</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
+
+            {/* Table Body */}
             <TableBody>
               {students.map((student) => (
                 <TableRow key={student.id}>
-                  <TableCell className="font-medium whitespace-nowrap">
+                  {/* Student Name */}
+                  <TableCell className="text-sm whitespace-nowrap">
                     {student.student_name}
                   </TableCell>
-                  <TableCell className="whitespace-nowrap">
+
+                  {/* Cohort Information */}
+                  <TableCell className="whitespace-nowrap text-sm">
                     {student.cohort}
                   </TableCell>
+
+                  {/* List of Courses with Icons */}
                   <TableCell>
                     <div className="flex flex-wrap gap-2">
                       {student.student_courses?.map((sc) => {
-                        const Icon = sc.courses.course_name.includes('Science') ? Book : GraduationCap
+                        // Dynamically select an icon based on the course name
+                        const Icon = sc.courses.course_name.includes('Science') ? Book : GraduationCap;
                         return (
                           <div
                             key={sc.id}
-                            className="inline-flex items-center gap-1.5 text-sm whitespace-nowrap"
+                            className="inline-flex items-center gap-1 text-sm whitespace-nowrap"
                           >
                             <Icon className="h-4 w-4" />
-                            <span>{sc.courses.course_name}</span>
+                            <Badge className="rounded-sm text-sm text-[#000000] bg-gray-100">
+                              {sc.courses.course_name}
+                            </Badge>
                           </div>
-                        )
+                        );
                       })}
                     </div>
                   </TableCell>
-                  <TableCell className="whitespace-nowrap text-gray-500">
-                    {student.date_joined ?
-                      new Date(student.date_joined).toLocaleDateString('en-US', {
+
+                  {/* Date Joined */}
+                  <TableCell className="whitespace-nowrap text-sm">
+                    {student.date_joined
+                      ? new Date(student.date_joined).toLocaleDateString('en-US', {
                         day: '2-digit',
                         month: 'short',
-                        year: 'numeric'
-                      }) :
-                      'N/A'
-                    }
+                        year: 'numeric',
+                      })
+                      : 'N/A'}
                   </TableCell>
-                  <TableCell className="whitespace-nowrap text-gray-500">
-                    {student.last_login ?
-                      new Date(student.last_login).toLocaleString('en-US', {
+
+                  {/* Last Login */}
+                  <TableCell className="whitespace-nowrap text-sm">
+                    {student.last_login
+                      ? new Date(student.last_login).toLocaleString('en-US', {
                         day: '2-digit',
                         month: 'short',
                         year: 'numeric',
                         hour: '2-digit',
                         minute: '2-digit',
-                        hour12: true
-                      }) :
-                      'Never'
-                    }
+                        hour12: true,
+                      })
+                      : 'Never'}
                   </TableCell>
+
+                  {/* Status Indicator */}
                   <TableCell>
                     <span
-                      className={`inline-flex h-2 w-2 rounded-full ${student.status === 'active' ? 'bg-green-500' : 'bg-red-500'
+                      className={`inline-flex h-3 w-3 ml-[20px] rounded-full ${student.status === 'active' ? 'bg-green-500' : 'bg-red-500'
                         }`}
                     />
                   </TableCell>
+
+                  {/* Actions Dropdown */}
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -219,30 +237,34 @@ export function StudentTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        {/* Edit Action */}
                         <DropdownMenuItem
                           onClick={() => {
-                            setSelectedStudent(student)
+                            setSelectedStudent(student);
                             setFormData({
                               student_name: student.student_name,
                               cohort: student.cohort,
                               status: student.status,
-                              courses: student.student_courses.map(sc => ({
+                              courses: student.student_courses.map((sc) => ({
                                 id: sc.course_id,
                                 course_name: sc.courses.course_name,
-                                course_code: sc.courses.course_code
-                              }))
-                            })
-                            setIsDialogOpen(true)
+                                course_code: sc.courses.course_code,
+                              })),
+                            });
+                            setIsDialogOpen(true);
                           }}
                         >
                           Edit
                         </DropdownMenuItem>
+                        {/* Delete Action */}
                         <DropdownMenuItem
                           className="text-red-600"
                           onClick={() => {
-                            if (window.confirm('Are you sure you want to delete this student?')) {
-                              deleteStudent(student.id)
-                            }
+                            toast({
+                              title: 'Success',
+                              description: 'Student deleted successfully',
+                            });
+                            deleteStudent(student.id);
                           }}
                         >
                           Delete
@@ -257,6 +279,7 @@ export function StudentTable() {
         </div>
       </div>
 
+      {/* Add/Edit Student Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -264,7 +287,9 @@ export function StudentTable() {
               {selectedStudent ? 'Edit Student' : 'Add New Student'}
             </DialogTitle>
           </DialogHeader>
+          {/* Student Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Student Name Input */}
             <div className="space-y-2">
               <Label htmlFor="name">Student Name</Label>
               <Input
@@ -277,6 +302,7 @@ export function StudentTable() {
               />
             </div>
 
+            {/* Status Dropdown */}
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
               <Select
@@ -295,6 +321,7 @@ export function StudentTable() {
               </Select>
             </div>
 
+            {/* Courses Selection */}
             <div className="space-y-4">
               <Label>Courses</Label>
               <div className="space-y-2">
@@ -302,19 +329,30 @@ export function StudentTable() {
                   <Button
                     key={course.name}
                     type="button"
-                    variant={formData.courses.some(c => c.course_name === course.name) ? 'default' : 'outline'}
+                    variant={
+                      formData.courses.some((c) => c.course_name === course.name)
+                        ? 'default'
+                        : 'outline'
+                    }
                     className="w-full justify-start"
                     onClick={() => {
-                      const hasCourse = formData.courses.some(c => c.course_name === course.name)
+                      const hasCourse = formData.courses.some(
+                        (c) => c.course_name === course.name
+                      );
                       setFormData({
                         ...formData,
                         courses: hasCourse
-                          ? formData.courses.filter(c => c.course_name !== course.name)
-                          : [...formData.courses, {
-                            course_name: course.name,
-                            course_code: course.name.split(' ').pop()
-                          }]
-                      })
+                          ? formData.courses.filter(
+                            (c) => c.course_name !== course.name
+                          )
+                          : [
+                            ...formData.courses,
+                            {
+                              course_name: course.name,
+                              course_code: course.name.split(' ').pop(),
+                            },
+                          ],
+                      });
                     }}
                   >
                     <course.icon className="h-4 w-4 mr-2" />
@@ -331,6 +369,7 @@ export function StudentTable() {
         </DialogContent>
       </Dialog>
     </div>
+
   )
 }
 

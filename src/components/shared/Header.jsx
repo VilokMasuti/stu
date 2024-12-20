@@ -1,4 +1,4 @@
-import { MessageSquare, HelpCircle, Bell, Settings, Menu } from 'lucide-react'
+import { MessageSquare, HelpCircle, Bell, Settings, Menu, Search, } from 'lucide-react'
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -8,7 +8,7 @@ export function Header() {
   const { toggleSidebar } = useSidebarStore()
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 flex h-20   shrink-0 items-center gap-x-4   px-4 sm:gap-x-6 sm:px-6 lg:px-8">
       <Button
         variant="ghost"
         size="icon"
@@ -19,12 +19,14 @@ export function Header() {
       </Button>
 
       <div className="flex flex-1 items-center justify-between gap-x-4">
-        <form className="flex-1 max-w-lg">
+        <form className="flex-1 max-w-lg   bg-white rounded-lg" >
           <div className="relative">
+            <Search className="pointer-events-none absolute inset-y-0 left-0 h-full w-5 text-gray-400 ml-3" />
             <Input
               type="search"
+
               placeholder="Search your course"
-              className="h-9 md:h-10 w-full pl-3 focus-visible:ring-0"
+              className="h-10 md:h-10 w-full pl-10  rounded-lg focus-visible:ring-0 "
             />
           </div>
         </form>
@@ -49,10 +51,10 @@ export function Header() {
 
           <div className="hidden items-center gap-x-3 lg:flex">
             <Avatar className="h-8 w-8">
-              <AvatarImage src="/placeholder.svg" alt="AD" />
+              <AvatarImage src="/Avatar Image.png" alt="AD" />
               <AvatarFallback>AD</AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium">Adeline H. Dancy</span>
+            <span className="text-sm  font-bold">Adeline H. Dancy</span>
           </div>
         </div>
       </div>
