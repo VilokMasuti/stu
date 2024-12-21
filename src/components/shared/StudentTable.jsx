@@ -35,7 +35,7 @@ import useStore from '../../store/useStore'
 import { Badge } from '../ui/badge'
 import LoadingSpinner from './LoadingSpinner'
 export function StudentTable() {
-  const { toast } = useToast(); // Use pop-up messages to tell the user what happened (success/error)
+  const { toast } = useToast();
 
   // Fetch the data and functions to show, add, edit, and delete students
   const {

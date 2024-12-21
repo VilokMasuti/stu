@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useSidebarStore } from "@/store/sidebar-store"
+import { Link } from 'react-router-dom'
 
 export function Header() {
   const { toggleSidebar } = useSidebarStore()
@@ -32,16 +33,20 @@ export function Header() {
         </form>
         <div className="flex items-center gap-x-4 lg:gap-x-6">
           <Button variant="ghost" size="icon" className="relative">
-            <HelpCircle className="h-6 w-6 text-gray-400" />
+            <Link to="/help">      <HelpCircle className="h-6 w-6 text-gray-400" />  </Link>
+
           </Button>
 
           <Button variant="ghost" size="icon" className="relative">
-            <MessageSquare className="h-6 w-6 text-gray-400" />
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
+            <Link to="/message">     <MessageSquare className="h-6 w-6 text-gray-400" /> </Link>
+
+            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 animate-ping duration-1000" />
           </Button>
 
           <Button variant="ghost" size="icon" className="relative">
-            <Settings className="h-6 w-6 text-gray-400" />
+            <Link to="/settings">   <Settings className="h-6 w-6 text-gray-400" /> </Link>
+
+
           </Button>
 
           <Button variant="ghost" size="icon" className="relative">

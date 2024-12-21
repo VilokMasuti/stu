@@ -8,6 +8,7 @@ import Reports from "@/pages/Reports";
 import Settings from "@/pages/Settings";
 import Help from "@/pages/Help";
 import Chapter from "@/pages/Chapter";
+import Message from './pages/Message';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
               <Route path="/settings" element={<Settings />} />
               <Route path="/help" element={<Help />} />
               <Route path="/chapter" element={<Chapter />} />
+              <Route path="/message" element={<Message />} />
             </Routes>
           </main>
         </div>
